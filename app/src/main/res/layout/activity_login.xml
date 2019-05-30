@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/background">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/robot"
+            android:layout_marginTop="100dp"
+            android:layout_gravity="center_horizontal"/>
+
+        <LinearLayout
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#503366FF"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp">
+
+            <EditText
+                android:layout_width="300dp"
+                android:layout_height="60dp"
+                android:hint="@string/code"
+                android:layout_gravity="center_horizontal"
+                android:drawableLeft="@drawable/account"
+                android:layout_marginTop="30dp"/>
+
+            <EditText
+                android:layout_width="300dp"
+                android:layout_height="60dp"
+                android:hint="@string/acount"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:drawableLeft="@drawable/lock"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="350dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:background="@color/buttonColor"
+            android:text="@string/login"
+            android:textColor="#FFFFFF"
+            android:textSize="22dp" />
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
