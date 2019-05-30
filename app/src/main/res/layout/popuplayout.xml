@@ -24,6 +24,18 @@
         android:background="@drawable/list_line"/>
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/change_robot"
+        android:layout_margin="20dp"
+        android:id="@+id/change_robot"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/list_line"/>
+
+    <TextView
         android:id="@+id/pop_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

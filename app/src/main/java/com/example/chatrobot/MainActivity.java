@@ -53,10 +53,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MsgAdapter msgAdapter;
     private DrawerLayout drawerLayout;
     private static int IMAGE_REQUEST_CODE = 2;
+    private static int USERS_IMAGE = 1;
     private PopupWindow mPopWindow;
     private String paths;
     private CircleImageView head;
-
 
 
     @Override
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.nav_call:
                         Toast.makeText(MainActivity.this, "暂时无逻辑", Toast.LENGTH_SHORT).show();
                         break;
@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         //更换头像
-        View headView=navigationView.inflateHeaderView(R.layout.nav_header);
-        head=(CircleImageView)headView.findViewById(R.id.icon_image);
+        View headView = navigationView.inflateHeaderView(R.layout.nav_header);
+        head = (CircleImageView) headView.findViewById(R.id.icon_image);
         head.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,11 +177,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 cursor.close();
                 Bitmap bitmap = BitmapFactory.decodeFile(paths);
                 head.setImageBitmap(bitmap);
-                CircleImageView user=(CircleImageView)findViewById(R.id.user_image);
+                CircleImageView user = (CircleImageView) findViewById(R.id.user_image);
                 user.setImageBitmap(bitmap);
+                Toast.makeText(this, "聊天框换头像有bug，未完善", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        if (requestCode == USERS_IMAGE && resultCode == RESULT_OK) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            paths = cursor.getString(columnIndex);
+            cursor.close();
+            Bitmap bitmap1 = BitmapFactory.decodeFile(paths);
+            CircleImageView robot = (CircleImageView) findViewById(R.id.robot_image);
+            robot.setImageBitmap(bitmap1);
+            Toast.makeText(this, "此操作目前有bug，还未完善", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -195,25 +209,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //设置各个控件的点击响应
         TextView tv1 = (TextView) contentView.findViewById(R.id.pop_clear);
         TextView tv2 = (TextView) contentView.findViewById(R.id.pop_cancel);
+        TextView tv3 = (TextView) contentView.findViewById(R.id.change_robot);
         tv1.setOnClickListener(this);
         tv2.setOnClickListener(this);
+        tv3.setOnClickListener(this);
         //显示PopupWindow
         View rootview = LayoutInflater.from(MainActivity.this).inflate(R.layout.activity_main, null);
         mPopWindow.showAtLocation(rootview, Gravity.HORIZONTAL_GRAVITY_MASK, 0, 0);
     }
 
+    //popuplayout点击事件
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.pop_clear:
                 msgList.clear();
-                msgAdapter=new MsgAdapter(msgList);
+                msgAdapter = new MsgAdapter(msgList);
                 msgAdapter.notifyDataSetChanged();
                 msgAdapter.notifyItemInserted(0);
                 recyclerView.scrollToPosition(0);
                 mPopWindow.dismiss();
                 break;
             case R.id.pop_cancel:
+                mPopWindow.dismiss();
+                break;
+            case R.id.change_robot:
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, USERS_IMAGE);
                 mPopWindow.dismiss();
                 break;
             default:

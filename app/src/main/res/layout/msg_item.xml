@@ -14,7 +14,8 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/pika"/>
+            android:id="@+id/robot_image"
+            android:src="@drawable/pika" />
 
         <TextView
             android:layout_width="wrap_content"
