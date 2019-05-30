@@ -1,7 +1,13 @@
 package com.example.chatrobot;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,10 +18,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -33,7 +43,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String URL_KEY = "http://www.tuling123.com/openapi/api";
     private static final String API_key = "98e8a48049784263bcf27c7020bce824";
     private List<Msg> msgList = new ArrayList<>();
@@ -43,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
     private MsgAdapter msgAdapter;
     private DrawerLayout drawerLayout;
     private static int IMAGE_REQUEST_CODE = 2;
+    private PopupWindow mPopWindow;
+    private String paths;
+    private CircleImageView head;
+
 
 
     @Override
@@ -54,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setItemIconTintList(null);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -64,14 +79,30 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                drawerLayout.closeDrawers();
-                Toast.makeText(MainActivity.this, "暂时无逻辑", Toast.LENGTH_SHORT).show();
+                switch (menuItem.getItemId()){
+                    case R.id.nav_call:
+                        Toast.makeText(MainActivity.this, "暂时无逻辑", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_friends:
+                        Toast.makeText(MainActivity.this, "暂时无逻辑", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_location:
+                        Toast.makeText(MainActivity.this, "暂时无逻辑", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_mail:
+                        Toast.makeText(MainActivity.this, "暂时无逻辑", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.settings:
+                        showPopupWindow();
+                }
                 return true;
             }
         });
+
+
         //更换头像
         View headView=navigationView.inflateHeaderView(R.layout.nav_header);
-        CircleImageView head=(CircleImageView)headView.findViewById(R.id.icon_image);
+        head=(CircleImageView)headView.findViewById(R.id.icon_image);
         head.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,6 +163,65 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //相册选取更换头像
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
+            try {
+                Uri selectedImage = data.getData();
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                paths = cursor.getString(columnIndex);
+                cursor.close();
+                Bitmap bitmap = BitmapFactory.decodeFile(paths);
+                head.setImageBitmap(bitmap);
+                CircleImageView user=(CircleImageView)findViewById(R.id.user_image);
+                user.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    //popupwindow的显示和点击事件
+    private void showPopupWindow() {
+        View contentView = LayoutInflater.from(MainActivity.this).inflate(R.layout.popuplayout, null);
+        mPopWindow = new PopupWindow(contentView,
+                DrawerLayout.LayoutParams.WRAP_CONTENT, DrawerLayout.LayoutParams.WRAP_CONTENT, true);
+        mPopWindow.setContentView(contentView);
+        //设置各个控件的点击响应
+        TextView tv1 = (TextView) contentView.findViewById(R.id.pop_clear);
+        TextView tv2 = (TextView) contentView.findViewById(R.id.pop_cancel);
+        tv1.setOnClickListener(this);
+        tv2.setOnClickListener(this);
+        //显示PopupWindow
+        View rootview = LayoutInflater.from(MainActivity.this).inflate(R.layout.activity_main, null);
+        mPopWindow.showAtLocation(rootview, Gravity.HORIZONTAL_GRAVITY_MASK, 0, 0);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.pop_clear:
+                msgList.clear();
+                msgAdapter=new MsgAdapter(msgList);
+                msgAdapter.notifyDataSetChanged();
+                msgAdapter.notifyItemInserted(0);
+                recyclerView.scrollToPosition(0);
+                mPopWindow.dismiss();
+                break;
+            case R.id.pop_cancel:
+                mPopWindow.dismiss();
+                break;
+            default:
+                break;
+        }
+    }
+
+    //drawwerlayout的显示点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -143,5 +233,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
 
 }
